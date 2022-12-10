@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import Form from "./components/Form";
+import GlobalStyle from './styles/global'
 import { Header } from "./components/Header";
 import Resume from './components/Resume'
-import GlobalStyle from './styles/global'
+import Form from "./components/Form";
 
 export const App = () => {
   const data = localStorage.getItem("transactions")
-  const [transactionList, setTransactionList] = useState(
+  const [transactionsList, setTransactionsList] = useState(
     data ? JSON.parse(data) : []
   )
 
@@ -15,11 +15,11 @@ export const App = () => {
   const [total, setTotal] = useState(0)
 
   useEffect(() => {
-    const amountExpense = transactionList
+    const amountExpense = transactionsList
     .filter((item) => item.expense)
     .map(transaction => Number(transaction.amount))
 
-    const amountIncome = transactionList
+    const amountIncome = transactionsList
     .filter((item) => !item.expense)
     .map((transaction) => Number(transaction.amount))
 
@@ -31,13 +31,21 @@ export const App = () => {
     setIncome(`RS ${income}`)
     setExpense(`RS ${expense}`)
     setTotal(`${Number(income) < Number(expense) ? " - " : ""}R$ ${total}`)
-  }, [transactionList])
+  }, [transactionsList])
+
+  const handleAdd = (transaction) => {
+    const newArrayTransactions = [...transactionsList, transaction]
+
+    setTransactionsList(newArrayTransactions)
+
+    localStorage.setItem("transactions", JSON.stringify(newArrayTransactions))
+  }
 
   return (
     <>
     <Header/>
-    <Resume/>
-    <Form/>
+    <Resume income={income} expense={expense} total={total}/>
+    <Form handleAdd={handleAdd} transactionsList={transactionsList} setTransactionsList={setTransactionsList}/>
     <GlobalStyle/>
     </>
   )
